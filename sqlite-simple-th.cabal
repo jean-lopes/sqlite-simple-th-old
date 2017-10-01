@@ -1,0 +1,25 @@
+name:                sqlite-simple-th
+version:             0.0.0.0
+synopsis:            sqlite-simple wrapper 
+homepage:            https://github.com/jean-lopes/sqlite-simple-th#readme
+license:             MIT
+license-file:        LICENSE
+author:              Jean Carlo Giambastiani Lopes
+maintainer:          Jean Carlo Giambastiani Lopes
+copyright:           Copyright (c) 2017 Jean Carlo Giambastiani Lopes
+category:            database
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+source-repository head
+  type:     git
+  location: https://github.com/jean-lopes/sqlite-simple-th
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Database.SQLite.Simple.TH
+  build-depends:       base >= 4.7 && < 5
+                     , sqlite-simple
+  default-language:    Haskell2010
+  ghc-options:         -Wall -Werror
