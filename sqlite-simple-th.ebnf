@@ -1,0 +1,147 @@
+underscore = '_';
+
+digit = '0' | '1' | '2' | '3' | '4' 
+      | '5' | '6' | '7' | '8' | '9'
+      ;
+
+integer = digit - '0', { digit };
+
+float = integer, [ '.', integer ];
+
+scientific = float, 'E', [ '+' | '-' ], integer;
+
+lower-case-letter 
+    = 'a' | 'b' | 'c' | 'd' | 'e' | 'f'
+    | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' 
+    | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' 
+    | 's' | 't' | 'u' | 'v' | 'w' | 'x' 
+    | 'y' | 'z' ;
+
+upper-case-letter
+    = 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+    | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' 
+    | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' 
+    | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' 
+    | 'Y' | 'Z' ;
+
+letter = lower-case-letter | upper-case-letter;
+
+alphanumeric = digit | letter;
+
+character = alphanumeric | underscore;
+
+identifier = letter, { character } ;
+
+column-name = identifier;
+
+type-name = 'TEXT'
+          | 'INTEGER'
+          | 'REAL'
+          | 'BLOB'
+          ;
+
+column-type = type-name;
+
+column-constraint = 'NOT NULL';
+
+column-definition = column-name, column-type, [ column-constraint ];
+
+table-name = identifier;
+
+table-constraint = 'KEY', column-name, { ',', column-name };
+
+table-definition = identifier, '('
+                 , column-definition, { ',', column-definition }
+                 , table-constraint
+                 , ')'
+                 ;
+
+table-definition-list = table-definition, { table-definition };
+
+select-stmt = 'SELECT', [ 'DISTINCT' | 'ALL' ]
+            , result-column, { ',', result-column }
+            , 'FROM', table-name
+            , [ 'WHERE', expr ]
+            , [ order-by ]
+            , [ 'GROUP', 'BY', expr, { ',', expr }, [ 'HAVING', expr ] ]
+            ;
+
+result-column = '*' | expr, [ [ 'AS' ], column-name ];
+
+expr = literal-value
+     | [ table-name, '.' ], column-name
+     | unary-operator, expr
+     | expr, binary-operator, expr
+     | '(', expr, ')'
+     | 'CAST', '(', expr, 'AS', type-name, ')'
+     ;
+
+literal-value = numeric-literal
+              | string-literal
+              | 'NULL'
+              ;
+
+numeric-literal = scientific 
+                | float
+                | integer
+                ;
+
+string-literal = "'", any-character - "'", "'";
+
+unary-operator = '-' | '+' | '~' | 'NOT' ;
+
+(* ordem de precedencia por linha *)
+binary-operator = '||' 
+                | '*' | '/' | '%'
+                | '+', | '-'
+                | '<<' | '>>' | '&' | '|'
+                | '=' | '==' | '!=' | '<>' | 'IS', [ 'NOT' ] | 'IN' | 'LIKE' | 'GLOB' | 'MATCH' | 'REGEXP'
+                | 'AND'
+                | 'OR'
+                ;
+
+insert-stmt = 'INSERT', 'INTO', table-name, [ '(', column-name, { ',', column-name }, ')' ], 'VALUES', '(', expr, { ',', expr }, ')';
+
+update-stmt = 'UPDATE', table-name, 'SET'
+            , column-name, '=', expr
+            , { ',', column-name, '=', expr }
+            , [ 'WHERE', expr ] 
+            , [ order-by ]
+            ;
+
+order-by = 'ORDER', 'BY', ordering-term, { ',', ordering-term };
+
+ordering-term = expr, [ 'ASC' | 'DESC' ];
+
+delete-stmt = 'DELETE', 'FROM', table-name, [ 'WHERE', expr ];
+
+(* invalid identifiers, this is here just for reference *)
+keywords = sqlite-keywords | haskell-keywords;
+
+haskell-keywords
+    = 'AS' | 'CASE' | 'CLASS' | 'DATA' | 'DEFAULT' | 'DERIVING' | 'DO' | 'ELSE' 
+    | 'FAMILY' | 'FORALL' | 'FOREIGN' | 'HIDING' | 'IF' | 'IMPORT' | 'IN' 
+    | 'INFIX' | 'INFIXL' | 'INFIXR' | 'INSTANCE' | 'INSTANCE' | 'LET' | 'MDO' 
+    | 'MODULE' | 'NEWTYPE' | 'OF' | 'PROC' | 'QUALIFIED' | 'REC' | 'THEN' 
+    | 'TYPE' | 'WHERE' ;
+
+sqlite-keywords
+    = 'ABORT' | 'ACTION' | 'ADD' | 'AFTER' | 'ALL' | 'ALTER' | 'ANALYZE' | 'AND' 
+    | 'AS' | 'ASC' | 'ATTACH' | 'AUTOINCREMENT' | 'BEFORE' | 'BEGIN' | 'BETWEEN' 
+    | 'BY' | 'CASCADE' | 'CASE' | 'CAST' | 'CHECK' | 'COLLATE' | 'COLUMN' 
+    | 'COMMIT' | 'CONFLICT' | 'CONSTRAINT' | 'CREATE' | 'CROSS' | 'CURRENT_DATE' 
+    | 'CURRENT_TIME' | 'CURRENT_TIMESTAMP' | 'DATABASE' | 'DEFAULT' 
+    | 'DEFERRABLE' | 'DEFERRED' | 'DELETE' | 'DESC' | 'DETACH' | 'DISTINCT' 
+    | 'DROP' | 'EACH' | 'ELSE' | 'END' | 'ESCAPE' | 'EXCEPT' | 'EXCLUSIVE' 
+    | 'EXISTS' | 'EXPLAIN' | 'FAIL' | 'FOR' | 'FOREIGN' | 'FROM' | 'FULL' 
+    | 'GLOB' | 'GROUP' | 'HAVING' | 'IF' | 'IGNORE' | 'IMMEDIATE' | 'IN' 
+    | 'INDEX' | 'INDEXED' | 'INITIALLY' | 'INNER' | 'INSERT' | 'INSTEAD' 
+    | 'INTERSECT' | 'INTO' | 'IS' | 'ISNULL' | 'JOIN' | 'KEY' | 'LEFT' | 'LIKE' 
+    | 'LIMIT' | 'MATCH' | 'NATURAL' | 'NO' | 'NOT' | 'NOTNULL' | 'NULL' | 'OF' 
+    | 'OFFSET' | 'ON' | 'OR' | 'ORDER' | 'OUTER' | 'PLAN' | 'PRAGMA' | 'PRIMARY' 
+    | 'QUERY' | 'RAISE' | 'RECURSIVE' | 'REFERENCES' | 'REGEXP' | 'REINDEX' 
+    | 'RELEASE' | 'RENAME' | 'REPLACE' | 'RESTRICT' | 'RIGHT' | 'ROLLBACK' 
+    | 'ROW' | 'SAVEPOINT' | 'SELECT' | 'SET' | 'TABLE' | 'TEMP' | 'TEMPORARY' 
+    | 'THEN' | 'TO' | 'TRANSACTION' | 'TRIGGER' | 'UNION' | 'UNIQUE' | 'UPDATE' 
+    | 'USING' | 'VACUUM' | 'VALUES' | 'VIEW' | 'VIRTUAL' | 'WHEN' | 'WHERE' 
+    | 'WITH' | 'WITHOUT' ;

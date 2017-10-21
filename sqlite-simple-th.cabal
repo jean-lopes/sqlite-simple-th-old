@@ -20,6 +20,8 @@ library
   hs-source-dirs:      src
   exposed-modules:     Database.SQLite.Simple.TH
   build-depends:       base >= 4.7 && < 5
-                     , sqlite-simple
+                     , mtl
+                     , resourcet
+                     , sqlite-simple                     
   default-language:    Haskell2010
-  ghc-options:         -Wall -Werror
+  ghc-options:         -Wall
